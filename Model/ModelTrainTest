@@ -1,0 +1,63 @@
+================================================================================================================================================================
+Best Model Selection: The code identifies the lag p that minimizes the MAE and fits the best AutoReg model with that lag.
+Residuals: It calculates and plots the residuals (the differences between the predicted and actual values) to inspect model fit.
+ACF of Residuals: The Autocorrelation Function (ACF) of the residuals is plotted to check if there is any remaining correlation in the errors.
+Forecasting Loop: A loop forecasts values in the test set one step at a time:
+History Update: After each forecast, the model is updated with the actual test data to improve future predictions.
+Prediction Output: The forecasted values are stored and displayed with their timestamps.
+================================================================================================================================================================
+
+
+------# Find the best lag value by identifying the `p` with the lowest MAE
+best_p = mae_series.idxmin()
+
+------# Fit the AutoReg model with the best lag value `best_p`
+best_model = AutoReg(y_train, lags=best_p).fit()
+
+------# Extract residuals (differences between observed and predicted values) from the best model
+y_train_resid = pd.Series(best_model.resid)
+
+------# Name the residuals for better clarity when inspecting
+y_train_resid.name = "residuals"
+
+------# Show the first few residuals (differences between actual and predicted values)
+y_train_resid.head()
+
+------# Plot a histogram of the residuals to visualize the distribution of errors
+plt.hist(y_train_resid, bins=30, edgecolor='black')
+
+------# Set the title and axis labels for the residuals histogram
+plt.title("Best Model, Training Residuals")
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+
+------# Plot the Autocorrelation Function (ACF) of the residuals to check for patterns or autocorrelation
+plot_acf(y_train_resid, lags=40, ax=plt.gca())
+
+------# Initialize an empty Pandas Series to store predictions
+y_pred_wfv = pd.Series()
+
+------# Start the history with the training data
+history = y_train.copy()
+
+------# Loop over each point in the test set (one-step ahead forecasting)
+for i in range(len(y_test)):
+    
+------# Fit the model using the training data up to this point (history)
+    model = AutoReg(history, lags=best_p).fit()
+    
+------# Forecast the next value (1-step ahead prediction)
+    next_pred = model.forecast(steps=1)
+    
+------# Append the prediction to the Series, using the corresponding test timestamp
+    y_pred_wfv = y_pred_wfv.append(pd.Series(next_pred, index=[y_test.index[i]]))
+    
+------# Update the history with the actual test observation to improve future forecasts
+    history = history.append(y_test[i:i+1])
+
+# Name the predictions for clarity and set the index name to "timestamp"
+y_pred_wfv.name = "prediction"
+y_pred_wfv.index.name = "timestamp"
+
+# Show the first few predictions from the forecast
+y_pred_wfv.head()
