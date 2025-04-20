@@ -1,0 +1,17 @@
+def wrangle(collection):
+    results = collection.find(
+        {"metadata.site": 11, "metadata.measurement": "P2"},
+            projection={"P2": 1, "timestamp": 1, "_id": 0},
+       
+    )
+    
+    df = pd.DataFrame(results).set_index("timestamp")
+    
+    df.index=df.index.tz_localize("utc").tz_convert("Africa/Dar_es_Salaam")
+    df=df[df["P2"]<100]
+    y = df["P2"].resample("1H").mean().fillna(method='ffill')
+   
+
+    return y
+
+
