@@ -1,0 +1,31 @@
+===============================================================================================================================================================
+Baseline Prediction: Creates a simple model by predicting the mean of the training data.
+Error Calculation: Measures the performance of the baseline model using Mean Absolute Error (MAE).
+AutoRegressive Model: Tests the AutoRegressive model for different lag values (p) from 1 to 30.
+Prediction and Error Calculation: For each lag, predicts values and calculates the MAE for comparison.
+Result Storage: Stores the MAE for each lag value in a Pandas Series for later inspection.
+===============================================================================================================================================================
+
+y_train_mean = y_train.mean()
+y_pred_baseline = [y_train_mean] * len(y_train)
+
+mae_baseline = mean_absolute_error(y_train, y_pred_baseline)
+
+p_params = range(1, 31)
+
+------------# Create an empty list to hold MAE scores for each lag value
+maes = []
+
+------------# Loop over all lag values in `p_params`
+for p in p_params:
+    model = AutoReg(y_train, lags=p).fit()
+    y_pred = model.predict().dropna()
+    mae = mean_absolute_error(y_train.iloc[p:], y_pred)
+    maes.append(mae)
+
+------------# Create a Pandas Series from the `maes` list with index `p_params` (representing the lag values)
+mae_series = pd.Series(maes, name="mae", index=p_params)
+
+------------# Display the first few values of the MAE series to inspect the results
+mae_series.head()
+
