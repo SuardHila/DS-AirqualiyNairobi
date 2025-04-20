@@ -1,0 +1,46 @@
+==================================================================================================================================================================
+This script connects to a local MongoDB instance, accesses the "air-quality" database and the "nairobi" collection. It lists all collections, prints a sample document, counts the total documents, and performs aggregations to:
+Count how many documents exist per site (metadata.site)
+Count how many measurements were recorded for site 29 grouped by metadata.measurement
+The results of the second aggregation are then loaded into a Pandas DataFrame for analysis or display.
+==================================================================================================================================================================
+
+
+
+from pprint import PrettyPrinter
+import pandas as pd
+from pymongo import MongoClient
+pp = PrettyPrinter()
+
+--------------# Connect to MongoDB
+client = MongoClient(host="localhost", port=27017)
+db = client["air-quality"]
+
+--------------# Print collections
+pp.pprint(list(client.list_databases()))
+for c in db.list_collections():
+    print(c["name"])
+
+--------------# Access 'nairobi' collection
+nairobi = db["nairobi"]
+print("Document count:", nairobi.count_documents({}))
+
+--------------# Show one sample doc
+pp.pprint(nairobi.find_one())
+
+--------------# Group by site
+result = nairobi.aggregate([
+    {"$group": {"_id": "$metadata.site", "count": {"$sum": 1}}}
+])
+pp.pprint(list(result))
+
+--------------# Group by measurement for site 29
+result = nairobi.aggregate([
+    {"$match": {"metadata.site": 29}},
+    {"$group": {"_id": "$metadata.measurement", "count": {"$sum": 1}}}
+])
+
+--------------# Convert to DataFrame
+df = pd.DataFrame(result)
+print("\nMeasurement counts for site 29:")
+print(df)
