@@ -1,0 +1,27 @@
+===================================================================================================================================================================
+Creating a DataFrame: Combines the actual (y_test) and predicted (y_pred_wfv) values into a DataFrame to compare them side by side.
+Interactive Plot: Uses Plotly (px.line) to create an interactive line plot where the x-axis represents time (timestamps), and the y-axis shows the PM2.5 levels.
+Plot Layout: The plot's title and axis labels are customized for better understanding and visualization.
+===================================================================================================================================================================
+
+# Create a DataFrame to compare actual test values (`y_test`) and predicted values (`y_pred_wfv`)
+df_pred_test = pd.DataFrame({
+    "y_test": y_test,          # Actual test values (PM2.5 levels)
+    "y_pred_wfv": y_pred_wfv   # Predicted values from the model
+})
+
+# Create an interactive line plot using Plotly to visualize actual vs predicted values
+fig = px.line(df_pred_test, 
+              x=df_pred_test.index,  # Set the x-axis to the index (timestamps)
+              y=["y_test", "y_pred_wfv"],  # Plot both actual and predicted values
+              )
+
+# Update the layout of the plot (title and axis labels)
+fig.update_layout(
+    title="Dar es Salaam, WFV Predictions",  # Set the plot title
+    xaxis_title="Date",                      # Label for the x-axis (Date)
+    yaxis_title="PM2.5 Level",               # Label for the y-axis (PM2.5 Level)
+)
+
+# Display the plot
+fig.show()
