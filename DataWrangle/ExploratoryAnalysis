@@ -1,1 +1,32 @@
+===================================================================================================================================================================
+Data Preparation: Converts data into a DataFrame for easier plotting and manipulation.
+Plotting: Plots raw and smoothed time series data (PM2.5 levels).
+Autocorrelation (ACF/PACF): Visualizes the relationship between current and past values.
+Train-Test Split: Splits the dataset into training and testing subsets for model training.
+===================================================================================================================================================================
 
+
+---------# Convert the data `y` into a Pandas DataFrame for easy manipulation
+df = pd.DataFrame(y)
+
+---------# Plot PM2.5 levels ("P2" column) against time, with labeled axes
+df["P2"].plot(xlabel="Date", ylabel="PM2.5 Level", ax=ax)
+
+---------# Set the title of the plot
+plt.title("Dar es Salaam PM2.5 Levels")
+
+---------# Plot the 7-day moving average of PM2.5 levels (168 hours), smooths fluctuations
+df["P2"].rolling(168).mean().plot(ax=ax, ylabel="PM2.5 Level", title="Weekly", xlabel="Date")
+
+---------# Plot the Autocorrelation Function (ACF) of the PM2.5 time series
+plot_acf(y, ax=ax)
+plt.xlabel("Lag [hours]")
+plt.ylabel("Correlation Coefficient")
+
+---------# Plot the Partial Autocorrelation Function (PACF) of the PM2.5 time series
+plot_pacf(y, ax=ax)
+
+---------# Split the data into training and test sets (90% train, 10% test)
+cutoff_test = int(len(y) * 0.9)
+y_train = y.iloc[:cutoff_test]  # Training set
+y_test = y.iloc[cutoff_test:]   # Test set
