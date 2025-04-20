@@ -1,4 +1,4 @@
-# DS-AirqualiyNairobi
+# DS-Dar es Salaam
 
 Project Description:
 This project analyzes PM2.5 (air pollution) data from Dar es Salaam using time series forecasting techniques. The goal is to predict future PM2.5 levels based on past data using an AutoRegressive (AR) model.
